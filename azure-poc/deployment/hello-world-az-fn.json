@@ -25,7 +25,7 @@
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2019-04-01",
+      "apiVersion": "2019-06-01",
       "name": "[variables('storageAccountName')]",
       "location": "[parameters('location')]",
       "sku": {
@@ -34,30 +34,31 @@
       "kind": "StorageV2",
       "properties": {
         "supportsHttpsTrafficOnly": true,
-        "RepoUrl": "https://github.com/Keeper-Security/Commander-Firefly.git",
-        "branch": "main",
-        "publishRunbook": true,
-        "IsManualIntegration": true
+        "minimumTlsVersion": "TLS1_2"
       }
     },
     {
       "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2020-06-01",
+      "apiVersion": "2018-11-01",
       "name": "[variables('hostingPlanName')]",
       "location": "[parameters('location')]",
+      "kind": "linux",
       "sku": {
         "name": "Y1",
         "tier": "Dynamic"
       },
       "properties": {
         "name": "[variables('hostingPlanName')]",
-        "computeMode": "Dynamic"
+        "workerSize": "0",
+        "workerSizeId": "0",
+        "numberOfWorkers": "1",
+        "reserved": true
       }
     },
 
     {
       "type": "Microsoft.Web/sites",
-      "apiVersion": "2020-06-01",
+      "apiVersion": "2018-11-01",
       "name": "[variables('functionAppName')]",
       "location": "[parameters('location')]",
       "kind": "functionapp,linux",
@@ -69,8 +70,8 @@
         "name": "[variables('functionAppName')]",
         "enabled": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-        "httpsOnly": true,
-        "linuxFxVersion": "DOCKER|microsoft/azure-functions-python3.6:2.0",
+        "clientAffinityEnabled": false,
+        "linuxFxVersion": "DOCKER|mcr.microsoft.com/azure-functions/python:3.0-python3.8",
         "siteConfig": {
           "appSettings": [
             {
@@ -122,12 +123,12 @@
       "type": "microsoft.insights/components",
       "apiVersion": "2020-02-02-preview",
       "name": "[variables('applicationInsightsName')]",
-      "location": "South Central US",
+      "location": "centralus",
       "tags": {
         "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('applicationInsightsName')))]": "Resource"
       },
       "properties": {
-        "ApplicationId": "South Central US",
+        "ApplicationId": "[variables('functionAppName')]",
         "Request_Source": "IbizaWebAppExtensionCreate"
       }
     }
