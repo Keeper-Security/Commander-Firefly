@@ -4,7 +4,7 @@
   "parameters": {
     "appName": {
       "type": "string",
-      "defaultValue": "[concat('comdr-', uniqueString(resourceGroup().id))]",
+      "defaultValue": "[concat('cmdr', uniqueString(resourceGroup().id))]",
       "metadata": {
         "description": "The name."
       }
@@ -19,7 +19,7 @@
     "functionAppName": "[parameters('appName')]",
     "hostingPlanName": "[parameters('appName')]",
     "applicationInsightsName": "[parameters('appName')]",
-    "storageAccountName": "[concat(parameters('appName'), '-sg')]"
+    "storageAccountName": "[concat(parameters('appName'), 'sg')]"
   },
 
   "resources": [
@@ -60,13 +60,17 @@
       "apiVersion": "2020-06-01",
       "name": "[variables('functionAppName')]",
       "location": "[parameters('location')]",
-      "kind": "functionapp",
+      "kind": "functionapp,linux",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
         "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
       ],
       "properties": {
+        "name": "[variables('functionAppName')]",
+        "enabled": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "httpsOnly": true,
+        "linuxFxVersion": "DOCKER|microsoft/azure-functions-python3.6:2.0",
         "siteConfig": {
           "appSettings": [
             {
@@ -82,12 +86,12 @@
               "value": "[toLower(variables('functionAppName'))]"
             },
             {
-              "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "~2"
+              "name": "FUNCTION_APP_EDIT_MODE",
+              "value": "readonly"
             },
             {
-              "name": "WEBSITE_NODE_DEFAULT_VERSION",
-              "value": "~10"
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~3"
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -98,7 +102,20 @@
               "value": "python"
             }
           ]
-        }
+        },
+        "resources": [
+          {
+            "apiVersion": "2019-08-01",
+            "type": "extensions",
+            "name": "zipdeploy",
+            "dependsOn": [
+              "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+            ],
+            "properties": {
+              "packageUri": "https://github.com/Keeper-Security/Commander-Firefly/archive/refs/heads/main.zip"
+            }
+          }
+        ]
       }
     },
     {
