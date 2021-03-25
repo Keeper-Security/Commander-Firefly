@@ -87,10 +87,6 @@
               "value": "[toLower(variables('functionAppName'))]"
             },
             {
-              "name": "FUNCTION_APP_EDIT_MODE",
-              "value": "readonly"
-            },
-            {
               "name": "FUNCTIONS_EXTENSION_VERSION",
               "value": "~3"
             },

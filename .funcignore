@@ -1,0 +1,6 @@
+.venv
+.vscode
+.idea
+.python_packages
+FireflyTester.py
+*config.json
