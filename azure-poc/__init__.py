@@ -1,36 +1,36 @@
 import logging
-
-import json
-import azure.functions as func
-from keepercommander.params import KeeperParams
-from firefly import Firefly
-
-logger = logging.getLogger()
-
-
-
-def main(req: func.HttpRequest) -> func.HttpResponse:
-
-    logging.info('Python HTTP trigger function processed a request.')
-
-    az_ad_user_record_uid = req.params.get('az_ad_user_record_uid')
-
-    params = KeeperParams()
-    Firefly.login(params)
-
-    if not az_ad_user_record_uid:
-        resp = Firefly.rotate_all_az_ad_users(params)
-    else:
-        resp = Firefly.rotate_single_az_ad_user(params, az_ad_user_record_uid)
-
-    # all_records = Firefly.get_all_records(params)
-    json_str = Firefly.to_json_str(resp)
-
-    return func.HttpResponse(
-        json_str,
-        mimetype="application/json"
-    )
-
+#
+# import json
+# import azure.functions as func
+# from keepercommander.params import KeeperParams
+# from firefly import Firefly
+#
+# logger = logging.getLogger()
+#
+#
+#
+# def main(req: func.HttpRequest) -> func.HttpResponse:
+#
+#     logging.info('Python HTTP trigger function processed a request.')
+#
+#     az_ad_user_record_uid = req.params.get('az_ad_user_record_uid')
+#
+#     params = KeeperParams()
+#     Firefly.login(params)
+#
+#     if not az_ad_user_record_uid:
+#         resp = Firefly.rotate_all_az_ad_users(params)
+#     else:
+#         resp = Firefly.rotate_single_az_ad_user(params, az_ad_user_record_uid)
+#
+#     # all_records = Firefly.get_all_records(params)
+#     json_str = Firefly.to_json_str(resp)
+#
+#     return func.HttpResponse(
+#         json_str,
+#         mimetype="application/json"
+#     )
+#
 
 
 

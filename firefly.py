@@ -16,13 +16,27 @@ import tempfile
 import json
 from keepercommander.params import KeeperParams
 from keepercommander import api
-from keepercommander.plugins import azureadpwd
 
 from azureadpwdplugin import AZADRotator
 
 logger = logging.getLogger()
 
-az_ad_admin_record_uid = '9TKCRisBexRYGdFcLmzC7g'
+
+private_key = os.getenv('KEEPER_CONFIG_PRIVATE_KEY')
+device_token = os.getenv('KEEPER_CONFIG_DEVICE_TOKEN')
+user = os.getenv('KEEPER_USER_EMAIL')
+password = os.getenv('KEEPER_USER_PASSWORD')
+
+
+# TODO: replace UID with using searching by Tags (custom fields)
+az_ad_admin_record_uid = os.getenv('KEEPER_AZAD_ADM_RECORD_UID')
+
+
+print("KEEPER_CONFIG_PRIVATE_KEY=[%s]" % len(private_key))
+print("KEEPER_CONFIG_DEVICE_TOKEN=[%s]" % len(device_token))
+print("KEEPER_USER_EMAIL=[%s]" % len(user))
+print("KEEPER_USER_PASSWORD=[%s]" % len(password))
+print("KEEPER_AZAD_ADM_RECORD_UID=[%s]" % len(az_ad_admin_record_uid))
 
 class Firefly:
 
@@ -30,10 +44,6 @@ class Firefly:
     def create_config_file_and_get_params(params):
         # type: (KeeperParams) -> None
 
-        private_key = "Pgfd273WVndjXSWqk7XRtmixr8_bk3gnJHf4Db4mO2k"
-        device_token = "DJgM5LOATjER-CFOZBjRFFmPk4OGIPTdfFCt2VuWSqeUDQ"
-        user = "mustinov+firefly-sa@keeperdemo.io"
-        password = "Pa$$word123"
 
         # create a temporary file
         firefly_temp_file = tempfile.NamedTemporaryFile(prefix="commander-config-", suffix=".json", delete=False)
@@ -60,7 +70,6 @@ class Firefly:
             params.server = params.config['server'] if 'server' in params.config else "https://keepersecurity.com"
             params.user = params.config['user']
             params.password = params.config['password']
-
 
     @staticmethod
     def login(params):

@@ -12,6 +12,11 @@ streamHandler = StreamHandler()
 app.logger.addHandler(streamHandler)
 
 
+# Login to Keeper (once)
+params = KeeperParams()
+Firefly.login(params)
+
+
 @app.route("/")
 def default():
     return "🐛 Firefly! 🦋"
@@ -23,9 +28,6 @@ def api_rotate():
     query_parameters = request.args
 
     record_uid = query_parameters.get('uid')
-
-    params = KeeperParams()
-    Firefly.login(params)
 
     if record_uid:
         app.logger.info('Processing single record [%s] rotation' % record_uid)
