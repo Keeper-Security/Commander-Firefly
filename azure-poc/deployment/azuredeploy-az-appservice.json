@@ -37,34 +37,6 @@
       "metadata": {
         "description": "App Service Plan's instance count"
       }
-    },
-    "repositoryURL": {
-      "type": "string",
-      "defaultValue": "https://github.com/Azure-Samples/python-docs-hello-world.git",
-      "metadata": {
-        "description": "The URL for the GitHub repository that contains the project to deploy."
-      }
-    },
-    "branch": {
-      "type": "string",
-      "defaultValue": "main",
-      "metadata": {
-        "description": "The branch of the GitHub repository to use."
-      }
-    },
-    "databaseName": {
-      "type": "string",
-      "defaultValue": "Tasks",
-      "metadata": {
-        "description": "The Cosmos DB database name."
-      }
-    },
-    "containerName": {
-      "type": "string",
-      "defaultValue": "Items",
-      "metadata": {
-        "description": "The Cosmos DB container name."
-      }
     }
   },
   "variables": {
@@ -78,6 +50,7 @@
       "name": "[variables('hostingPlanName')]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[parameters('location')]",
+      "kind": "linux",
       "sku": {
         "name": "[parameters('appServicePlanTier')]",
         "capacity": "[parameters('appServicePlanInstances')]"
@@ -90,6 +63,7 @@
       "apiVersion": "2019-08-01",
       "name": "[variables('webSiteName')]",
       "type": "Microsoft.Web/sites",
+      "kind": "app,linux",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
@@ -97,6 +71,7 @@
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
         "siteConfig": {
+          "linuxFxVersion": "PYTHON|3.8",
           "appSettings": [
             {
               "name": "CosmosDb:Account",
@@ -119,8 +94,8 @@
             "[resourceId('Microsoft.Web/sites', variables('webSiteName'))]"
           ],
           "properties": {
-            "repoUrl": "[parameters('repositoryURL')]",
-            "branch": "[parameters('branch')]",
+            "repoUrl": "https://github.com/Azure-Samples/python-docs-hello-world.git",
+            "branch": "main",
             "isManualIntegration": true
           }
         }
