@@ -2,11 +2,12 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "applicationName": {
+    "webAppName": {
       "type": "string",
-      "defaultValue": "[concat('py-hi', uniqueString(resourceGroup().id))]",
+      "defaultValue": "[concat('zebApp-', uniqueString(resourceGroup().id))]",
+      "minLength": 2,
       "metadata": {
-        "description": "Application Name, max length 30 characters"
+        "description": "Zeb app name."
       }
     },
     "location": {
@@ -16,85 +17,64 @@
         "description": "Location for all resources."
       }
     },
-    "appServicePlanTier": {
+    "sku": {
       "type": "string",
       "defaultValue": "F1",
-      "allowedValues": [
-        "F1", "D1",
-        "B1", "B2", "B3",
-        "S1", "S2", "S3",
-        "P1", "P2", "P3", "P4"
-      ],
       "metadata": {
-        "description": "App Service Plan's pricing tier. Details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+        "description": "The SKU of App Service Plan."
       }
     },
-    "appServicePlanInstances": {
-      "type": "int",
-      "defaultValue": 1,
-      "minValue": 1,
-      "maxValue": 3,
+    "linuxFxVersion": {
+      "type": "string",
+      "defaultValue": "PYTHON|3.8",
       "metadata": {
-        "description": "App Service Plan's instance count"
+        "description": "The Runtime stack of current web app"
       }
     }
   },
   "variables": {
-    "cosmosAccountName": "[toLower(parameters('applicationName'))]",
-    "webSiteName": "[parameters('applicationName')]",
-    "hostingPlanName": "[parameters('applicationName')]"
+    "appServicePlanPortalName": "[concat('AppServicePlan-', parameters('webAppName'))]"
   },
   "resources": [
     {
-      "apiVersion": "2019-08-01",
-      "name": "[variables('hostingPlanName')]",
       "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('appServicePlanPortalName')]",
       "location": "[parameters('location')]",
-      "kind": "linux",
       "sku": {
-        "name": "[parameters('appServicePlanTier')]",
-        "capacity": "[parameters('appServicePlanInstances')]"
+        "name": "[parameters('sku')]"
       },
+      "kind": "linux",
       "properties": {
-        "name": "[variables('hostingPlanName')]"
+        "reserved": true
       }
     },
     {
-      "apiVersion": "2019-08-01",
-      "name": "[variables('webSiteName')]",
       "type": "Microsoft.Web/sites",
-      "kind": "app,linux",
+      "apiVersion": "2020-06-01",
+      "name": "[parameters('webAppName')]",
       "location": "[parameters('location')]",
+
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]"
       ],
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]",
         "siteConfig": {
-          "linuxFxVersion": "PYTHON|3.8",
-          "appSettings": [
-            {
-              "name": "CosmosDb:Account",
-              "value": "AAA"
-            },
-            {
-              "name": "CosmosDb:ContainerName",
-              "value": "BBB"
-            }
-          ]
+          "linuxFxVersion": "[parameters('linuxFxVersion')]"
         }
       },
       "resources": [
         {
           "type": "sourcecontrols",
-          "apiVersion": "2019-08-01",
+          "apiVersion": "2020-06-01",
           "name": "web",
           "location": "[parameters('location')]",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('webSiteName'))]"
+            "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
           ],
           "properties": {
-            "repoUrl": "https://github.com/Azure-Samples/python-docs-hello-world.git",
+            "repoUrl": "https://github.com/VMoose/AzureWebServiceSampleCode.git",
             "branch": "main",
             "isManualIntegration": true
           }
