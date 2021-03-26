@@ -45,6 +45,7 @@
   "variables": {
     "appName": "[concat('firefy-', uniqueString(resourceGroup().id, deployment().name))]",
     "appServicePlanPortalName": "[concat(variables('appName'), '-appServicePlan')]",
+    "appCronJobName": "[concat(variables('appName'), '-cron')]",
     "location": "[resourceGroup().location]",
     "sku": "F1",
     "linuxFxVersion": "PYTHON|3.8"
@@ -113,6 +114,65 @@
           }
         }
 
+      ]
+    },
+
+    {
+      "apiVersion": "2016-03-01",
+      "type": "Microsoft.Scheduler/jobCollections",
+      "name": "[variables('appCronJobName')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('appName'))]"
+      ],
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "sku": {
+          "name": "Free"
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "2016-03-01",
+          "type": "jobs",
+          "name": "Rotator",
+          "dependsOn": [
+            "[concat('Microsoft.Scheduler/jobCollections/', variables('appCronJobName'))]"
+          ],
+          "properties": {
+            "state": "Enabled",
+            "action": {
+              "type": "Http",
+              "request": {
+                "uri": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('appName'))).hostNames[0], 'api/v1/firefly/rotate')]",
+                "method": "GET",
+                "retryPolicy": {
+                  "retryType": "None"
+                }
+              }
+            },
+            "recurrence": {
+              "interval": 1,
+              "frequency": "Week",
+              "schedule": {
+                "weekDays": [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday"
+                ],
+                "hours": [
+                  10,
+                  12
+                ],
+                "minutes": [
+                  0,
+                  30
+                ]
+              }
+            }
+          }
+        }
       ]
     }
   ]

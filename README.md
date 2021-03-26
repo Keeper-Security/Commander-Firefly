@@ -1,6 +1,8 @@
 # Commander-Firefly
 Commander Password Rotator POC
 
+[![Deploy To Azure Py-Hi](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FKeeper-Security%2FCommander-Firefly%2Fmain%2Fdeployment%2Fazuredeploy-az-appservice.json)
+
 
 
 
@@ -12,12 +14,24 @@ Setup:
     b. 
 
 2. In Keeper Vault create a new record that will contain details for the Azure Active Directory App registration. See below how to obtain one.
+Custom fields in the record:
+   
+| Custom field name | Custom field value |
+| ----------------- | ------------------ |
+| `cmdr:azure_tenant_id` | Tenant ID |
+| `cmdr:azure_client_id` | Client ID |
+| `cmdr:azure_secret` | Client Secret |
+
+![img_1.png](img_1.png)
+
+Rest endpoints:
+Rotate all records: [app-url]/api/v1/firefly/rotate
+
+Rotate single record: [app-url]/api/v1/firefly/rotate?uid=UID123
 
 
 
-
-
-## Azure Ac App Registration
+## Azure AD App Registration
 Steps to obtain Azure Active Directory App registration with permissions to modify password in Active Directory
 
 ### Register new application

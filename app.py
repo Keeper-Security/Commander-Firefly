@@ -6,7 +6,7 @@ from logging import StreamHandler
 from firefly import Firefly
 
 app = Flask(__name__)
-app.config["DEBUG"] = True
+# app.config["DEBUG"] = True
 logging.basicConfig(level=logging.DEBUG)
 streamHandler = StreamHandler()
 app.logger.addHandler(streamHandler)
@@ -19,7 +19,15 @@ Firefly.login(params)
 
 @app.route("/")
 def default():
-    return "🐛 Firefly! 🦋"
+    return """
+    
+    🐛 Firefly! 🦋
+    
+    <a href=/api/v1/firefly/rotate>Rote all</a>
+    <a href=/api/v1/firefly/rotate?uid=50cLhCRC-jK8YZY6EInRJQ>Rote One</a>
+
+    
+    """
 
 
 @app.route('/api/v1/firefly/rotate', methods=['GET'])

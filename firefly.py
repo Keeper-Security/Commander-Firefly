@@ -8,7 +8,7 @@
 # Copyright 2021 Keeper Security Inc.
 # Contact: ops@keepersecurity.com
 #
-import base64
+
 import logging
 import os
 import tempfile
