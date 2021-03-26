@@ -1,6 +1,40 @@
+import logging
 from flask import Flask
+from flask import request, jsonify
+from keepercommander.params import KeeperParams
+from logging import StreamHandler
+from firefly import Firefly
+
 app = Flask(__name__)
+app.config["DEBUG"] = True
+logging.basicConfig(level=logging.DEBUG)
+streamHandler = StreamHandler()
+app.logger.addHandler(streamHandler)
+
 
 @app.route("/")
-def hello():
-    return "Hello, World!"
+def default():
+    return "🐛 Firefly! 🦋"
+
+
+@app.route('/api/v1/firefly/rotate', methods=['GET'])
+def api_rotate():
+
+    query_parameters = request.args
+
+    record_uid = query_parameters.get('uid')
+
+    params = KeeperParams()
+    Firefly.login(params)
+
+    if record_uid:
+        app.logger.info('Processing single record [%s] rotation' % record_uid)
+        resp = Firefly.rotate_single_az_ad_user(params, record_uid)
+    else:
+        app.logger.info('Processing ALL records rotation')
+        resp = Firefly.rotate_all_az_ad_users(params)
+
+    return jsonify(resp)
+
+
+# app.run()

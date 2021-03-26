@@ -1,48 +1,23 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "parameters": {
-    "webAppName": {
-      "type": "string",
-      "defaultValue": "[concat('zebApp-', uniqueString(resourceGroup().id))]",
-      "minLength": 2,
-      "metadata": {
-        "description": "Zeb app name."
-      }
-    },
-    "location": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "Location for all resources."
-      }
-    },
-    "sku": {
-      "type": "string",
-      "defaultValue": "F1",
-      "metadata": {
-        "description": "The SKU of App Service Plan."
-      }
-    },
-    "linuxFxVersion": {
-      "type": "string",
-      "defaultValue": "PYTHON|3.8",
-      "metadata": {
-        "description": "The Runtime stack of current web app"
-      }
-    }
-  },
+
   "variables": {
-    "appServicePlanPortalName": "[concat('AppServicePlan-', parameters('webAppName'))]"
+    "appName": "[concat('firefy-', uniqueString(resourceGroup().id, deployment().name))]",
+    "appServicePlanPortalName": "[concat(variables('appName'), '-appServicePlan')]",
+    "location": "[resourceGroup().location]",
+    "sku": "F1",
+    "linuxFxVersion": "PYTHON|3.8"
   },
+
   "resources": [
     {
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2020-06-01",
       "name": "[variables('appServicePlanPortalName')]",
-      "location": "[parameters('location')]",
+      "location": "[variables('location')]",
       "sku": {
-        "name": "[parameters('sku')]"
+        "name": "[variables('sku')]"
       },
       "kind": "linux",
       "properties": {
@@ -52,8 +27,8 @@
     {
       "type": "Microsoft.Web/sites",
       "apiVersion": "2020-06-01",
-      "name": "[parameters('webAppName')]",
-      "location": "[parameters('location')]",
+      "name": "[variables('appName')]",
+      "location": "[variables('location')]",
 
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]"
@@ -61,7 +36,7 @@
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]",
         "siteConfig": {
-          "linuxFxVersion": "[parameters('linuxFxVersion')]"
+          "linuxFxVersion": "[variables('linuxFxVersion')]"
         }
       },
       "resources": [
@@ -69,12 +44,12 @@
           "type": "sourcecontrols",
           "apiVersion": "2020-06-01",
           "name": "web",
-          "location": "[parameters('location')]",
+          "location": "[variables('location')]",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+            "[resourceId('Microsoft.Web/sites', variables('appName'))]"
           ],
           "properties": {
-            "repoUrl": "https://github.com/VMoose/AzureWebServiceSampleCode.git",
+            "repoUrl": "https://github.com/Keeper-Security/Commander-Firefly.git",
             "branch": "main",
             "isManualIntegration": true
           }
