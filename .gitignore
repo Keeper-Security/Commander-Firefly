@@ -362,6 +362,7 @@ tags
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+.vscode
 
 ### Windows ###
 # Windows thumbnail cache files
@@ -454,6 +455,6 @@ venv.bak/
 __pycache__/
 *.py[cod]
 *$py.class
-.vscode
+
 .idea
 *config.json
