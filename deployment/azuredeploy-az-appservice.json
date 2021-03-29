@@ -1,16 +1,9 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
 
   "parameters": {
-    "resourceGropuName": {
-      "type": "string",
-      "defaultValue": "firefly",
-      "metadata": {
-        "description": "Name of the resouce group to create."
-      }
 
-    },
 
     "keeperConfigPrivateKey": {
       "type": "securestring",
@@ -48,158 +41,137 @@
   },
 
   "variables": {
-    "guid": "firefly-1",
-    "appName": "[concat('firefly2-', variables('guid'))]",
+    "appName": "[concat('firefy-', uniqueString(resourceGroup().id, deployment().name))]",
     "appServicePlanPortalName": "[concat(variables('appName'), '-appServicePlan')]",
     "appCronJobName": "[concat(variables('appName'), '-cron')]",
-    "location": "West US",
+    "location": "[resourceGroup().location]",
     "sku": "F1",
-    "linuxFxVersion": "PYTHON|3.8"        
-},
+    "linuxFxVersion": "PYTHON|3.8"
+  },
 
   "resources": [
     {
-      "type": "Microsoft.Resources/resourceGroups",
-      "apiVersion": "2020-10-01",
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('appServicePlanPortalName')]",
       "location": "[variables('location')]",
-      "name": "[parameters('resourceGropuName')]",
-      "properties": {}
+      "sku": {
+        "name": "[variables('sku')]"
+      },
+      "kind": "linux",
+      "properties": {
+        "reserved": true
+      }
     },
-
-
     {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2020-10-01",
-      "name": "storageDeployment",
-      "resourceGroup": "[parameters('resourceGropuName')]",
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('appName')]",
+      "location": "[variables('location')]",
+
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/resourceGroups/', parameters('resourceGropuName'))]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]"
       ],
       "properties": {
-        "mode": "Incremental",
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "parameters": {},
-          "variables": {},
-          "resources": [
-            {
-              "type": "Microsoft.Web/serverfarms",
-              "apiVersion": "2020-06-01",
-              "name": "[variables('appServicePlanPortalName')]",
-              "location": "[variables('location')]",
-              "resourceGroup": "[variables('rgName')]",
-              "dependsOn": [
-                "[resourceId('Microsoft.Resources/resourceGroups/', variables('rgName'))]"
-              ],
-              "sku": {
-                "name": "[variables('sku')]"
-              },
-              "kind": "linux",
-              "properties": {
-                "reserved": true
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]",
+        "siteConfig": {
+          "linuxFxVersion": "[variables('linuxFxVersion')]"
+        }
+      },
+      "resources": [
+        {
+          "type": "sourcecontrols",
+          "apiVersion": "2020-06-01",
+          "name": "web",
+          "location": "[variables('location')]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('appName'))]"
+          ],
+          "properties": {
+            "repoUrl": "https://github.com/Keeper-Security/Commander-Firefly.git",
+            "branch": "main",
+            "isManualIntegration": true
+          }
+        },
+        {
+          "name": "appsettings",
+          "type": "config",
+          "apiVersion": "2015-08-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('appName'))]"
+          ],
+          "tags": {
+            "displayName": "appsettings"
+          },
+          "properties": {
+            "KEEPER_CONFIG_PRIVATE_KEY": "[parameters('keeperConfigPrivateKey')]",
+            "KEEPER_CONFIG_DEVICE_TOKEN": "[parameters('keeperConfigDeviceToken')]",
+            "KEEPER_USER_EMAIL": "[parameters('keeperUserEmail')]",
+            "KEEPER_USER_PASSWORD": "[parameters('keeperUserPassword')]",
+            "KEEPER_AZAD_ADM_RECORD_UID": "[parameters('keeperAzAdAdminRecordUid')]"
+          }
+        }
+
+      ]
+    },
+
+    {
+      "apiVersion": "2016-03-01",
+      "type": "Microsoft.Scheduler/jobCollections",
+      "name": "[variables('appCronJobName')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('appName'))]"
+      ],
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "sku": {
+          "name": "Free"
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "2016-03-01",
+          "type": "jobs",
+          "name": "Rotator",
+          "dependsOn": [
+            "[concat('Microsoft.Scheduler/jobCollections/', variables('appCronJobName'))]"
+          ],
+          "properties": {
+            "state": "Enabled",
+            "action": {
+              "type": "Http",
+              "request": {
+                "uri": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('appName'))).hostNames[0], 'api/v1/firefly/rotate')]",
+                "method": "GET",
+                "retryPolicy": {
+                  "retryType": "None"
+                }
               }
             },
-            {
-              "type": "Microsoft.Web/sites",
-              "apiVersion": "2020-06-01",
-              "name": "[variables('appName')]",
-              "location": "[variables('location')]",
-        
-              "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]"
-              ],
-              "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]",
-                "siteConfig": {
-                  "linuxFxVersion": "[variables('linuxFxVersion')]"
-                }
-              },
-              "resources": [
-                {
-                  "type": "sourcecontrols",
-                  "apiVersion": "2020-06-01",
-                  "name": "web",
-                  "location": "[variables('location')]",
-                  "dependsOn": [
-                    "[resourceId('Microsoft.Web/sites', variables('appName'))]"
-                  ],
-                  "properties": {
-                    "repoUrl": "https://github.com/Keeper-Security/Commander-Firefly.git",
-                    "branch": "main",
-                    "isManualIntegration": true
-                  }
-                },
-                {
-                  "name": "appsettings",
-                  "type": "config",
-                  "apiVersion": "2015-08-01",
-                  "dependsOn": [
-                    "[resourceId('Microsoft.Web/sites', variables('appName'))]"
-                  ],
-                  "tags": {
-                    "displayName": "appsettings"
-                  },
-                  "properties": {
-                    "KEEPER_CONFIG_PRIVATE_KEY": "[parameters('keeperConfigPrivateKey')]",
-                    "KEEPER_CONFIG_DEVICE_TOKEN": "[parameters('keeperConfigDeviceToken')]",
-                    "KEEPER_USER_EMAIL": "[parameters('keeperUserEmail')]",
-                    "KEEPER_USER_PASSWORD": "[parameters('keeperUserPassword')]",
-                    "KEEPER_AZAD_ADM_RECORD_UID": "[parameters('keeperAzAdAdminRecordUid')]"
-                  }
-                }
-        
-              ]
-            },
-            {
-              "apiVersion": "2016-03-01",
-              "type": "Microsoft.Scheduler/jobCollections",
-              "name": "[variables('appCronJobName')]",
-              "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('appName'))]"
-              ],
-              "location": "[variables('location')]",
-              "properties": {
-                "sku": {
-                  "name": "Free"
-                }
-              },
-              "resources": [
-                {
-                  "apiVersion": "2016-03-01",
-                  "type": "jobs",
-                  "name": "Rotator",
-                  "dependsOn": [
-                    "[concat('Microsoft.Scheduler/jobCollections/', variables('appCronJobName'))]"
-                  ],
-                  "properties": {
-                    "state": "Enabled",
-                    "action": {
-                      "type": "Http",
-                      "request": {
-                        "uri": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('appName'))).hostNames[0], 'api/v1/firefly/rotate')]",
-                        "method": "GET",
-                        "retryPolicy": {
-                          "retryType": "None"
-                        }
-                      }
-                    },
-                    "recurrence": {
-                      "interval": 1,
-                      "frequency": "Week",
-                      "schedule": {
-                        "weekDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                        "hours": [10, 12],
-                        "minutes": [0, 30]
-                      }
-                    }
-                  }
-                }
-              ]
+            "recurrence": {
+              "interval": 1,
+              "frequency": "Week",
+              "schedule": {
+                "weekDays": [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday"
+                ],
+                "hours": [
+                  10,
+                  12
+                ],
+                "minutes": [
+                  0,
+                  30
+                ]
+              }
             }
-          ]
+          }
         }
-      }
+      ]
     }
   ]
 }

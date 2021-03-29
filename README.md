@@ -1,8 +1,53 @@
 # Commander-Firefly
-Commander Password Rotator POC
 
-[![Deploy To Azure Py-Hi](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FKeeper-Security%2FCommander-Firefly%2Fmain%2Fdeployment%2Fazuredeploy-az-appservice.json)
+Commander Password Rotator Proof Of Concept (POC)
+This template will create fully working Password rotation POC in Azure Cloud that will have endpoints to rotate Active Directory Users Password based on Keeper Record UID.
 
+Following Components will be created and configured:
+
+- App Service (Web App hosting Python Rest endpoints)
+  - Source code will be cloned from GitHub project
+  - Environment variables will be configured based on the data entered in the initial form
+
+## Prerequisites
+
+- Azure account with Active Subscription. [Link](https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade) to add new Subscription to the existing Azure account
+- New or existing Resource Group
+- Keeper Account
+- Records in Keeper Vault
+  1. Azure Service User with appropriate permissions with custom fields
+  2. Azure Active Directory users details whose password will be rotated
+- Locally installed [Keeper Commander](https://github.com/Keeper-Security/Commander)
+
+
+![img.png](img.png)
+
+
+
+
+
+---------------
+WORK IN PROGRESS
+
+---------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FKeeper-Security%2FCommander-Firefly%2Fmain%2Fdeployment%2Fazuredeploy-az-appservice.json)
+
+This application works both with Azure Active Directory and Keeper to keep password
 
 
 
@@ -29,6 +74,19 @@ Rotate all records: [app-url]/api/v1/firefly/rotate
 
 Rotate single record: [app-url]/api/v1/firefly/rotate?uid=UID123
 
+
+
+Tell what to do after deployment
+   Screenshot of the Azure App S
+
+
+
+
+
+How to pause
+
+
+How to delete
 
 
 ## Azure AD App Registration
