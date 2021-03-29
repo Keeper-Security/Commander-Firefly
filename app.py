@@ -21,11 +21,12 @@ Firefly.login(params)
 def default():
     return """
     
-    🐛 Firefly! 🦋
+    🐛 Firefly! <img src="https://www.flaticon.com/svg/vstatic/svg/878/878036.svg?token=exp=1617043390~hmac=a41911213c845e51dd9d77925ec3517e" alt="Firefly Icon" width="20" height="20">
     
-    <a href=/api/v1/firefly/rotate>Rote all</a>
+    <br/>
+    <br/>
+    <a href=/api/v1/firefly/rotate>Rote all</a> <br/>
     <a href=/api/v1/firefly/rotate?uid=50cLhCRC-jK8YZY6EInRJQ>Rote One</a>
-
     
     """
 
