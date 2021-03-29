@@ -34,9 +34,16 @@ Following Components will be created and configured:
 ![img_2.png](docs/img_2.png)<br/><br /> This will generate a new `config.json` file in the current working directory<br /><br/>![img_3.png](docs/img_3.png)<br />
    Open that file and take note of all the generated values there. We will use them later when we will be deploying Template to Azure
 
-### 3. Create Azure AD Accounts
+### 3. Create Azure AD Accounts/Users
 - Follow steps from [the official Azure Documentation](https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/add-users-azure-active-directory)
-- Make a record for each account in Keeper Vault recording just email address in the "Login" field<br/>![img_4.png](docs/img_4.png)
+- Make a record for each account in Keeper Vault. Enter email address of the Azure AD User in the "Login" field and add following custom fields to mark it as rotatable:
+
+| Custom field name | Custom field value |
+| ----------------- | ------------------ |
+| `tag` | `azure ad rotatable` |
+
+<br/>Sample record in Keeper Vault
+<br/>![img.png](docs/img_7.png)
 
 ### 4. Create Azure API Access (App Registration)
 
@@ -55,12 +62,25 @@ Needed for the Function to interact with Azure Active Directory API
    | `cmdr:azure_tenant_id` | Tenant ID |
    | `cmdr:azure_client_id` | Client ID |
    | `cmdr:azure_secret` | Client Secret |
+   | `tag` | `azure app registration` |
 
     Refer to [THIS](https://github.com/Keeper-Security/Commander-Firefly/blob/main/docs/img_1.png) image
+
+Sample record in Keeper Vault<br />
+![img_1.png](docs/img_8.png)
 
 ### 5. Deploy a template to Azure
 
 <br />[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FKeeper-Security%2FCommander-Firefly%2Fmain%2Fdeployment%2Fazuredeploy-az-appservice.json)
+
+Fill out fields:
+- Resource Group: Select Resource Group where infrastructure will be created
+- Keeper Config Private Key: Value `private_key` from config.json file
+- Keeper Config Device Token: Value `device_token` from config.json file
+- Keeper User Email: Keeper Account User Email
+- Keeper User Password: Keeper Account Password
+
+![img.png](docs/img_9.png)
 
 The following infrastructure will be created <br /> <br /> ![template-view.png](deployment/template-view.png)
 

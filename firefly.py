@@ -29,21 +29,20 @@ password = os.getenv('KEEPER_USER_PASSWORD')
 
 
 # TODO: replace UID with using searching by Tags (custom fields)
-az_ad_admin_record_uid = os.getenv('KEEPER_AZAD_ADM_RECORD_UID')
+# az_ad_admin_record_uid = os.getenv('KEEPER_AZAD_ADM_RECORD_UID')
 
 
 print("KEEPER_CONFIG_PRIVATE_KEY=[%s]" % len(private_key))
 print("KEEPER_CONFIG_DEVICE_TOKEN=[%s]" % len(device_token))
 print("KEEPER_USER_EMAIL=[%s]" % len(user))
 print("KEEPER_USER_PASSWORD=[%s]" % len(password))
-print("KEEPER_AZAD_ADM_RECORD_UID=[%s]" % len(az_ad_admin_record_uid))
+# print("KEEPER_AZAD_ADM_RECORD_UID=[%s]" % len(az_ad_admin_record_uid))
 
 class Firefly:
 
     @staticmethod
     def create_config_file_and_get_params(params):
         # type: (KeeperParams) -> None
-
 
         # create a temporary file
         firefly_temp_file = tempfile.NamedTemporaryFile(prefix="commander-config-", suffix=".json", delete=False)
@@ -95,6 +94,21 @@ class Firefly:
         return all_recs
 
     @staticmethod
+    def get_all_by_custom_field(params, cf_title, cf_values):
+
+        records = Firefly.get_all_records(params)
+
+        all_tagged_and_rotatable = []
+
+        for r in records:
+            for cf in r.custom_fields:
+                if cf_title == cf['name']:
+                    if cf['value'] == cf_values:
+                        all_tagged_and_rotatable.append(r)
+
+        return all_tagged_and_rotatable
+
+    @staticmethod
     def to_json_str(obj):
         def obj_dict(obj):
             return obj.__dict__
@@ -113,8 +127,6 @@ class Firefly:
         az_ad_admin_record = api.get_record(params, uid_of_az_ad_admin_record)
 
         print(az_ad_admin_record)
-        
-
 
         # 2. Rotate password
 
@@ -134,23 +146,28 @@ class Firefly:
         return True
 
     @staticmethod
-    def rotate_all_az_ad_users(params):
+    def rotate_all_az_ad_users(params, az_admin_record, records):
 
-        az_ad_user1_record_uid = '50cLhCRC-jK8YZY6EInRJQ'
-        az_ad_user2_record_uid = 'OPU-UzB2NubF8jFPduFVZw'
+        resp_dict = []
 
-        is_verified_user1 = Firefly.rotate_az_ad_acct(params, az_ad_admin_record_uid, az_ad_user1_record_uid)
-        is_verified_user2 = Firefly.rotate_az_ad_acct(params, az_ad_admin_record_uid, az_ad_user2_record_uid)
+        for r in records:
+            record_uid = r.record_uid
 
-        return {
-            az_ad_user1_record_uid: is_verified_user1,
-            az_ad_user2_record_uid: is_verified_user2
-        }
+            is_rotated = Firefly.rotate_az_ad_acct(params, az_admin_record.record_uid, record_uid)
+
+            resp_dict.append(
+                {
+                    'record_uid': r.record_uid,
+                    'status': is_rotated
+                }
+            )
+
+        return resp_dict
 
     @staticmethod
-    def rotate_single_az_ad_user(params, az_ad_user_record_uid):
+    def rotate_single_az_ad_user(params, az_admin_record,  az_ad_user_record_uid):
 
-        is_verified = Firefly.rotate_az_ad_acct(params, az_ad_admin_record_uid, az_ad_user_record_uid)
+        is_verified = Firefly.rotate_az_ad_acct(params, az_admin_record.record_uid, az_ad_user_record_uid)
 
         return {
             az_ad_user_record_uid: is_verified

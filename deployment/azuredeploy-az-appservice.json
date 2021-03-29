@@ -29,13 +29,6 @@
       "metadata": {
         "description": "Specifies password for Keeper User."
       }
-    },
-
-    "keeperAzAdAdminRecordUid": {
-      "type": "string",
-      "metadata": {
-        "description": "Specifies UID of a record that contain Azure AD App Registration details."
-      }
     }
 
   },
@@ -107,8 +100,7 @@
             "KEEPER_CONFIG_PRIVATE_KEY": "[parameters('keeperConfigPrivateKey')]",
             "KEEPER_CONFIG_DEVICE_TOKEN": "[parameters('keeperConfigDeviceToken')]",
             "KEEPER_USER_EMAIL": "[parameters('keeperUserEmail')]",
-            "KEEPER_USER_PASSWORD": "[parameters('keeperUserPassword')]",
-            "KEEPER_AZAD_ADM_RECORD_UID": "[parameters('keeperAzAdAdminRecordUid')]"
+            "KEEPER_USER_PASSWORD": "[parameters('keeperUserPassword')]"
           }
         }
 
