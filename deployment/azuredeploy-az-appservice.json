@@ -34,7 +34,7 @@
   },
 
   "variables": {
-    "appName": "[concat('firefy-', uniqueString(resourceGroup().id, deployment().name))]",
+    "appName": "[concat('firefly-', uniqueString(resourceGroup().id, deployment().name))]",
     "appServicePlanPortalName": "[concat(variables('appName'), '-appServicePlan')]",
     "appCronJobName": "[concat(variables('appName'), '-cron')]",
     "location": "[resourceGroup().location]",

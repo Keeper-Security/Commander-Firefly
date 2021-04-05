@@ -34,7 +34,33 @@ Following Components will be created and configured:
 ![img_2.png](docs/img_2.png)<br/><br /> This will generate a new `config.json` file in the current working directory<br /><br/>![img_3.png](docs/img_3.png)<br />
    Open that file and take note of all the generated values there. We will use them later when we will be deploying Template to Azure
 
-### 3. Create Azure AD Accounts/Users
+
+### 3. Create Azure API Access (App Registration)
+
+Needed for the Function to interact with Azure Active Directory API
+
+1. Create App Registration and Secret.
+
+   Follow steps from [HERE](https://github.com/Keeper-Security/Commander/tree/master/keepercommander/plugins/azureadpwd#configure-azure-application)
+
+2. Create new Keeper Record with custom fields containing App Registration details
+
+   Custom fields:
+
+   | Custom field name | Custom field value |
+      | ----------------- | ------------------ |
+   | `cmdr:azure_tenant_id` | Tenant ID |
+   | `cmdr:azure_client_id` | Client ID |
+   | `cmdr:azure_secret` | Client Secret |
+   | `tag` | `azure app registration` |
+
+   Refer to [THIS](https://github.com/Keeper-Security/Commander-Firefly/blob/main/docs/img_1.png) image
+
+Sample record in Keeper Vault<br />
+![docs/img_1.png](docs/img_8.png)
+
+
+### 4a. Create Azure AD Accounts/Users and Keeper Record
 - Follow steps from [the official Azure Documentation](https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/add-users-azure-active-directory)
 - Make a record for each account in Keeper Vault. Enter email address of the Azure AD User in the "Login" field and add following custom fields to mark it as rotatable:
 
@@ -45,29 +71,33 @@ Following Components will be created and configured:
 <br/>Sample record in Keeper Vault
 <br/>![img.png](docs/img_7.png)
 
-### 4. Create Azure API Access (App Registration)
+### 4b. Create Azure Windows VM and Keeper Record
 
-Needed for the Function to interact with Azure Active Directory API
+- [Create new](https://portal.azure.com/#create/Microsoft.VirtualMachine) Standard Windows VM
+    ![docs/img.png](docs/img13.png)
 
-1. Create App Registration and Secret.
+- Enable permissions (RBAC) for App Registration:
 
-    Follow steps from [HERE](https://github.com/Keeper-Security/Commander/tree/master/keepercommander/plugins/azureadpwd#configure-azure-application)
+    - Go to VM -> `Access control (IAM)` -> Under `Grant access to this resource` press `Add role assignments`
+    
+    Role: `Owner`
+    Assign access to: `User, group, or service principal`
+    Select: [Type App Service name]
+    
+    ![docs/img_10.png](docs/img_10.png)
 
-2. Create new Keeper Record with custom fields containing App Registration details
+- Create new record for this VM:
+    
+    | Regular or Custom field name | Custom field value |
+    | ----------------- | ------------------ |
+    | `Login` | User name to be used for local admin. Same value as in `Username` field in the new VM form |
+    | `az:subscription_id` | Azure Subscription ID |
+    | `az:vm_name` | Name of the virtual machine |
+    | `tag` | `azure vm rotate` |
 
-    Custom fields:
-
-   | Custom field name | Custom field value |
-   | ----------------- | ------------------ |
-   | `cmdr:azure_tenant_id` | Tenant ID |
-   | `cmdr:azure_client_id` | Client ID |
-   | `cmdr:azure_secret` | Client Secret |
-   | `tag` | `azure app registration` |
-
-    Refer to [THIS](https://github.com/Keeper-Security/Commander-Firefly/blob/main/docs/img_1.png) image
-
-Sample record in Keeper Vault<br />
-![img_1.png](docs/img_8.png)
+    Example Keeper Record:
+  
+    ![docs/img_1.png](docs/img_11.png)
 
 ### 5. Deploy a template to Azure
 
@@ -79,8 +109,6 @@ Fill out fields:
 - Keeper Config Device Token: Value `device_token` from config.json file
 - Keeper User Email: Keeper Account User Email
 - Keeper User Password: Keeper Account Password
-
-![img.png](docs/img_9.png)
 
 The following infrastructure will be created <br /> <br /> ![template-view.png](deployment/template-view.png)
 
@@ -96,7 +124,12 @@ After infrastructure is creates, after about 5 - 10 min, navigate to the URL of 
 
    [app-url]/api/v1/firefly/rotate?uid=UID123
 
-### 7. Cleanup
+
+### 7. Update Code
+
+Once there is a new code published to Git repository, the code in App Service can be updated by going to: "Deployment Center" -> Click on "Sync"
+
+### 8. Cleanup
 
 Login to Azure Portal, navigate to the Resource Group where the code was deployed and remove following:
 
