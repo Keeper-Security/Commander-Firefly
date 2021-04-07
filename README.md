@@ -26,10 +26,12 @@ Following Components will be created and configured:
 ## Setup Steps
 
 ### 1. Configure Keeper Account
+
 1. Login to [Keeper Vault](https://keepersecurity.com/vault/) with the new or existing Keeper Account
 2. Make sure that 2FA is disabled by going to `Settings` -> `Security` and uncheck "Two-Factor Authentication"
 
 ### 2. Generate Keeper Commander Configuration file
+
 1. Using [Keeper Commander](https://github.com/Keeper-Security/Commander) on local machine login using command: `keeper login` <br/><br />
 ![img_2.png](docs/img_2.png)<br/><br /> This will generate a new `config.json` file in the current working directory<br /><br/>![img_3.png](docs/img_3.png)<br />
    Open that file and take note of all the generated values there. We will use them later when we will be deploying Template to Azure
@@ -78,16 +80,16 @@ Sample record in Keeper Vault<br />
 
 - Enable permissions (RBAC) for App Registration:
 
-    - Go to VM -> `Access control (IAM)` -> Under `Grant access to this resource` press `Add role assignments`
-    
+  - Go to VM -> `Access control (IAM)` -> Under `Grant access to this resource` press `Add role assignments`
+
     Role: `Owner`
     Assign access to: `User, group, or service principal`
     Select: [Type App Service name]
-    
+
     ![docs/img_10.png](docs/img_10.png)
 
 - Create new record for this VM:
-    
+
     | Regular or Custom field name | Custom field value |
     | ----------------- | ------------------ |
     | `Login` | User name to be used for local admin. Same value as in `Username` field in the new VM form |
@@ -104,6 +106,7 @@ Sample record in Keeper Vault<br />
 <br />[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FKeeper-Security%2FCommander-Firefly%2Fmain%2Fdeployment%2Fazuredeploy-az-appservice.json)
 
 Fill out fields:
+
 - Resource Group: Select Resource Group where infrastructure will be created
 - Keeper Config Private Key: Value `private_key` from config.json file
 - Keeper Config Device Token: Value `device_token` from config.json file
@@ -123,7 +126,6 @@ After infrastructure is creates, after about 5 - 10 min, navigate to the URL of 
 2. Rotate a single Record
 
    [app-url]/api/v1/firefly/rotate?uid=UID123
-
 
 ### 7. Update Code
 

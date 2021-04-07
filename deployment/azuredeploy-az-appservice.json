@@ -36,9 +36,9 @@
   "variables": {
     "appName": "[concat('firefly-', uniqueString(resourceGroup().id, deployment().name))]",
     "appServicePlanPortalName": "[concat(variables('appName'), '-appServicePlan')]",
-    "appCronJobName": "[concat(variables('appName'), '-cron')]",
+    "appLogicAppName": "[concat(variables('appName'), '-logicapp')]",
     "location": "[resourceGroup().location]",
-    "sku": "F1",
+    "sku": "B2",
     "linuxFxVersion": "PYTHON|3.8"
   },
 
@@ -106,64 +106,66 @@
 
       ]
     },
-
     {
-      "apiVersion": "2016-03-01",
-      "type": "Microsoft.Scheduler/jobCollections",
-      "name": "[variables('appCronJobName')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', variables('appName'))]"
-      ],
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "sku": {
-          "name": "Free"
-        }
-      },
-      "resources": [
-        {
-          "apiVersion": "2016-03-01",
-          "type": "jobs",
-          "name": "Rotator",
-          "dependsOn": [
-            "[concat('Microsoft.Scheduler/jobCollections/', variables('appCronJobName'))]"
-          ],
-          "properties": {
-            "state": "Enabled",
-            "action": {
-              "type": "Http",
-              "request": {
-                "uri": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('appName'))).hostNames[0], 'api/v1/firefly/rotate')]",
-                "method": "GET",
-                "retryPolicy": {
-                  "retryType": "None"
-                }
+        "name": "[variables('appLogicAppName')]",
+        "type": "Microsoft.Logic/workflows",
+        "location": "[resourceGroup().location]",
+        "tags": {
+          "displayName": "[variables('appLogicAppName')]"
+        },
+        "apiVersion": "2016-06-01",
+        "dependsOn": [
+          "[resourceId('Microsoft.Web/sites', variables('appName'))]"
+        ],
+        "properties": {
+          "state": "Enabled",
+          "definition": {
+            "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+            "actions": {
+                "HTTP_AZ_AD": {
+                    "inputs": {
+                        "headers": {},
+                        "method": "GET",
+                        "uri": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('appName'))).hostNames[0], '/api/v1/firefly/rotate/az/ad')]"
+                    },
+                    "runAfter": {},
+                    "type": "Http"
+                },
+                "HTTP_AZ_VM": {
+                  "inputs": {
+                      "method": "GET",
+                      "uri": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('appName'))).hostNames[0], '/api/v1/firefly/rotate/az/vm')]"
+                  },
+                  "runAfter": {                  },
+                  "type": "Http"
               }
             },
-            "recurrence": {
-              "interval": 1,
-              "frequency": "Week",
-              "schedule": {
-                "weekDays": [
-                  "Monday",
-                  "Tuesday",
-                  "Wednesday",
-                  "Thursday",
-                  "Friday"
-                ],
-                "hours": [
-                  10,
-                  12
-                ],
-                "minutes": [
-                  0,
-                  30
-                ]
+            "contentVersion": "1.0.0.0",
+            "outputs": {},
+            "parameters": {},
+            "triggers": {
+              "Recurrence": {
+                  "recurrence": {
+                      "frequency": "Day",
+                      "interval": 1,
+                      "schedule": {
+                          "hours": [
+                              "7"
+                          ],
+                          "minutes": [
+                              0
+                          ]
+                      },
+                      "timeZone": "Pacific Standard Time"
+                  },
+                  "type": "Recurrence"
               }
-            }
           }
+        },
+          "parameters": {},
+          "accessControl": {},
+          "runtimeConfiguration": {}
         }
-      ]
     }
   ]
 }
