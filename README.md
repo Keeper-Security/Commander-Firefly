@@ -107,6 +107,7 @@ Sample record in Keeper Vault<br />
 Fill out fields:
 
 - Resource Group: Select Resource Group where infrastructure will be created
+- Keeper Server where `device_token` is registered
 - Keeper Config Private Key: Value `private_key` from config.json file
 - Keeper Config Device Token: Value `device_token` from config.json file
 - Keeper User Email: Keeper Account User Email

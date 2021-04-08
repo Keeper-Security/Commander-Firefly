@@ -29,7 +29,7 @@ device_token = os.getenv('KEEPER_CONFIG_DEVICE_TOKEN')
 user = os.getenv('KEEPER_USER_EMAIL')
 password = os.getenv('KEEPER_USER_PASSWORD')
 
-print("KEEPER_CONFIG_SERVER=[%s]" % len(server))
+print("KEEPER_CONFIG_SERVER=[%s]" % server)
 print("KEEPER_CONFIG_PRIVATE_KEY=[%s]" % len(private_key))
 print("KEEPER_CONFIG_DEVICE_TOKEN=[%s]" % len(device_token))
 print("KEEPER_USER_EMAIL=[%s]" % len(user))
@@ -51,7 +51,7 @@ class Firefly:
         # create a temporary file
         firefly_temp_file = tempfile.NamedTemporaryFile(prefix="commander-config-", suffix=".json", delete=False)
 
-        server_url = keeper_servers_map[server]
+        server_url = keeper_servers_map.get(server)
 
         print("server_url=[%s]" % server_url)
 
