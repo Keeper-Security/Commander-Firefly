@@ -12,7 +12,7 @@ Following Components will be created and configured:
 ## Prerequisites
 
 - Azure account with Active Subscription. [Link](https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade) to add new Subscription to the existing Azure account
-- New or existing Resource Group
+- New or existing Resource Group. Make sure to use [supported](docs/supported-az-regions.md) Azure Region
 - Keeper Account
 - Records in Keeper Vault
   1. Azure Service User with appropriate permissions with custom fields
@@ -35,7 +35,6 @@ Following Components will be created and configured:
 1. Using [Keeper Commander](https://github.com/Keeper-Security/Commander) on local machine login using command: `keeper login` <br/><br />
 ![img_2.png](docs/img_2.png)<br/><br /> This will generate a new `config.json` file in the current working directory<br /><br/>![img_3.png](docs/img_3.png)<br />
    Open that file and take note of all the generated values there. We will use them later when we will be deploying Template to Azure
-
 
 ### 3. Create Azure API Access (App Registration)
 
@@ -113,7 +112,7 @@ Fill out fields:
 - Keeper User Email: Keeper Account User Email
 - Keeper User Password: Keeper Account Password
 
-The following infrastructure will be created <br /> <br /> ![template-view.png](deployment/template-view.png)
+The following infrastructure will be created <br /> <br /> ![docs/img14.jpg](docs/img14.jpg)
 
 ### 6. Test
 
