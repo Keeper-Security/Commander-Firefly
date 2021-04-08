@@ -110,7 +110,7 @@
             "displayName": "appsettings"
           },
           "properties": {
-            "KEEPER_CONFIG_SERVER": "[parameters('keeperConfigServer')",
+            "KEEPER_CONFIG_SERVER": "[parameters('keeperConfigServer')]",
             "KEEPER_CONFIG_PRIVATE_KEY": "[parameters('keeperConfigPrivateKey')]",
             "KEEPER_CONFIG_DEVICE_TOKEN": "[parameters('keeperConfigDeviceToken')]",
             "KEEPER_USER_EMAIL": "[parameters('keeperUserEmail')]",
