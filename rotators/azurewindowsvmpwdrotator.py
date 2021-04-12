@@ -45,6 +45,7 @@ class AzureWindowsVMPwdRotator:
 
         # vmName = "mustinov-firefly-poc-pwd-rotation"
         vmName = rotate_record.get("az:vm_name")
+        vmLocation = rotate_record.get("az:vm_location")
 
 
         # local_admin_user_name = "mustinov"
@@ -69,7 +70,7 @@ class AzureWindowsVMPwdRotator:
                         'Password': local_admin_new_password
                     }
                 },
-                'location': "westus"
+                'location': vmLocation
             }
 
             print(json.dumps(vm_pwd_change_payload))

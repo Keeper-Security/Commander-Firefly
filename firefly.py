@@ -92,6 +92,12 @@ class Firefly:
         return params
 
     @staticmethod
+    def sync_down(params):
+        api.sync_down(params)
+        return params
+
+
+    @staticmethod
     def get_all_records(params):
 
         logging.info('Getting all records...')
