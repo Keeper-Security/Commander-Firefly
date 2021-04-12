@@ -94,6 +94,7 @@ Sample record in Keeper Vault<br />
     | `Login` | User name to be used for local admin. Same value as in `Username` field in the new VM form |
     | `az:subscription_id` | Azure Subscription ID |
     | `az:vm_name` | Name of the virtual machine |
+    | `az:vm_location` | Location of the VM virtual machine (See all available zones [HERE](docs/azure_regions_codes.md)) |
     | `tag` | `azure vm rotate` |
 
     Example Keeper Record:

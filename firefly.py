@@ -92,6 +92,12 @@ class Firefly:
         return params
 
     @staticmethod
+    def sync_down(params):
+        api.sync_down(params)
+        return params
+
+
+    @staticmethod
     def get_all_records(params):
 
         logging.info('Getting all records...')
@@ -138,14 +144,14 @@ class Firefly:
 
         az_ad_admin_record = api.get_record(params, uid_of_az_ad_admin_record)
 
-        print(az_ad_admin_record)
+        # print(az_ad_admin_record)
 
         # 2. Rotate password
 
         #   A. Find record to be rotated
         record_to_rotate = api.get_record(params, uid_of_record_to_rotate)
 
-        print('PWD Before: %s' % record_to_rotate.password)
+        # print('PWD Before: %s' % record_to_rotate.password)
 
         if record_to_rotate:
             is_az_rotated = AZADRotator.rotate(az_ad_admin_record, record_to_rotate)
