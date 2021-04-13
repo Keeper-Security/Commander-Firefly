@@ -75,8 +75,7 @@ Sample record in Keeper Vault<br />
 ### 4b. Create Azure Windows VM and Keeper Record
 
 - [Create new](https://portal.azure.com/#create/Microsoft.VirtualMachine) Standard Windows VM
-    ![docs/img.png](docs/img13.png)
-
+   <br /><br /> ![docs/img.png](docs/img13.png)<br /><br />
 - Enable permissions (RBAC) for App Registration:
 
   - Go to VM -> `Access control (IAM)` -> Under `Grant access to this resource` press `Add role assignments`
@@ -84,7 +83,7 @@ Sample record in Keeper Vault<br />
     Role: `Owner`
     Assign access to: `User, group, or service principal`
     Select: [Type App Service name]
-
+    <br />
     ![docs/img_10.png](docs/img_10.png)
 
 - Create new record for this VM:
@@ -99,7 +98,7 @@ Sample record in Keeper Vault<br />
 
     Example Keeper Record:
   
-    ![docs/img_1.png](docs/img_11.png)
+    ![docs/img_1.png](docs/img_11.jpeg)
 
 ### 5. Deploy a template to Azure
 

@@ -64,13 +64,13 @@ class AzureWindowsVMPwdRotator:
                     'typeHandlerVersion': '2.0',
                     'autoUpgradeMinorVersion': True,
                     'settings': {
-                        'UserName': local_admin_user_name
+                        'UserName': local_admin_user_name # TODO: make vmLocation to be dynamic based on the VM's metadata
                     },
                     'protectedSettings': {
                         'Password': local_admin_new_password
                     }
                 },
-                'location': vmLocation
+                'location': vmLocation  # TODO: make vmLocation to be dynamic based on the VM's metadata
             }
 
             print(json.dumps(vm_pwd_change_payload))
